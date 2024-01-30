@@ -1,13 +1,11 @@
-using System.Collections;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class BirdJump : MonoBehaviour
 {
     private Rigidbody2D rigid;
     private AudioSource audioSource;
-    private bool isLive;
-    private float startTime;
+    [SerializeField]
+    private GameManager manager;
 
     [SerializeField]
     private float jumpPower;
@@ -22,14 +20,9 @@ public class BirdJump : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
     }
 
-    private void Start()
-    {
-        isLive = true;
-    }
-
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0) && isLive)
+        if (Input.GetMouseButtonDown(0) && manager.isLive)
         {
             audioSource.clip = clips[0];
             audioSource.Play();
@@ -56,28 +49,11 @@ public class BirdJump : MonoBehaviour
                 PlayerPrefs.SetInt("BestScore", Score.bestScore);
             }
 
-            isLive = false;
             audioSource.clip = clips[1];
             audioSource.Play();
 
-            Time.timeScale = 0f;
-            startTime = Time.realtimeSinceStartup;
-            StartCoroutine(GameOver());
+            manager.GameOver();
         }
     }
 
-    private IEnumerator GameOver()
-    {
-        float elapsedTime = 0f;
-
-        while (elapsedTime < 0.5f)
-        {
-            yield return null;
-            elapsedTime = Time.realtimeSinceStartup - startTime;
-        }
-
-        Time.timeScale = 1f;
-
-        SceneManager.LoadScene("GameOverScene");
-    }
 }
